@@ -1,361 +1,389 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projet Franco-Allemand - Abri Solaire</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat:wght@600&display=swap" rel="stylesheet">
-    <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet" />
-	
-<link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+  <meta charset="utf-8" />
+  <title>Carte Interactive de nos Voyages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	
-<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
-<style>
-/* === CSS COMPLET POUR LA GALERIE AVEC GLIGHTBOX === */
-* {
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Swiper -->
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+  <!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
+  <style>
+    body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  scroll-behavior: smooth;
-}
-
-body {
-  font-family: 'Roboto', sans-serif;
-  background: linear-gradient(to bottom right, #f4f7f9, #e0f7f4);
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(to bottom, #f9f9f9, #e0e0e0);
   color: #333;
-  line-height: 1.6;
 }
 
-header {
-  background: linear-gradient(90deg, #00695c, #003d33);
-  color: white;
-  padding: 40px 20px;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  position: relative;
+#map {
+  height: 100vh;
+  width: 100%;
 }
 
-#lang-switcher {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
 }
 
-#lang-switcher button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  margin-left: 10px;
-  transition: transform 0.2s;
+.popup-content {
+  font-size: 15px;
+  padding: 10px;
+  line-height: 1.5;
 }
 
-#lang-switcher button:hover {
-  transform: scale(1.2);
-}
-
-header h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
-  font-family: 'Montserrat', sans-serif;
-}
-
-header img {
-  width: 40px;
-  vertical-align: middle;
-  margin: 0 10px;
-}
-
-nav {
-  background-color: #003d33;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  padding: 12px 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-nav a {
-  background: linear-gradient(to right, #00c6a7, #007b5e);
-  padding: 10px 20px;
-  border-radius: 30px;
-  color: white;
+.popup-content h3 {
+  margin-top: 0;
+  font-size: 20px;
   font-weight: 600;
-  text-decoration: none;
-  transition: background 0.3s, transform 0.2s;
+  color: #222;
 }
 
-nav a:hover {
-  background: linear-gradient(to right, #007b5e, #00c6a7);
-  transform: scale(1.05);
-}
-
-section {
-  padding: 60px 30px;
-  max-width: 1000px;
-  margin: 40px auto;
-  animation: fadeIn 1s ease;
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-}
-
-h2 {
-  color: #0d9488;
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  text-align: center;
-  font-family: 'Montserrat', sans-serif;
-}
-
-ul {
-  list-style: disc inside;
+.swiper-container {
+  width: 100%;
+  height: auto;
   margin-top: 10px;
-  padding-left: 10px;
 }
 
-.galerie {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+.swiper-slide {
+  text-align: center;
 }
 
-.galerie a {
-  display: block;
-  overflow: hidden;
-  border-radius: 16px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+.swiper-slide img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.galerie img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.3s ease;
-}
-
-.galerie a:hover img {
+.swiper-slide img:hover {
   transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-iframe {
-  display: block;
-  margin: 20px auto;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.popup-content a.project-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #0066ff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-footer {
-  background-color: #003d33;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 0.9rem;
-  margin-top: 40px;
+.popup-content a.project-link:hover {
+  color: #0044cc;
+  text-decoration: underline;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fr, .de {
+/* Galerie plein écran */
+.fullscreen-gallery {
   display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  background: rgba(0, 0, 0, 0.96);
+  z-index: 9999;
 }
-</style>
 
+.fullscreen-gallery.active {
+  display: block;
+}
+
+.fullscreen-gallery .swiper-slide img {
+  max-height: 80vh;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.close-gallery {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 36px;
+  color: #fff;
+  cursor: pointer;
+  z-index: 10000;
+  transition: transform 0.2s;
+}
+
+.close-gallery:hover {
+  transform: scale(1.2);
+}
+
+/* Popup Genially responsive */
+.leaflet-popup-content-wrapper.popup-genially {
+  width: auto !important;
+  max-width: 95vw !important;
+  padding: 0 !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.leaflet-popup-content.popup-genially {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.popup-genially iframe {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  border: none;
+}
+.leaflet-popup-content-wrapper {
+  background-color: #0a0f24 !important;
+  color: #00e5ff !important;
+  border: 1px solid #00e5ff;
+  border-radius: 10px;
+  box-shadow: 0 0 12px #00e5ff77;
+}
+.pulse-marker {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.7; }
+}
+#background-animation {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(#00bfff22 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#map {
+  position: relative;
+  z-index: 1;
+}
+.leaflet-marker-icon {
+  filter: drop-shadow(0 0 8px #00e5ff);
+  transition: transform 0.2s ease;
+}
+
+.leaflet-marker-icon:hover {
+  transform: scale(1.15);
+}
+.leaflet-popup {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.popup-content {
+  font-size: 14px;
+  color: #cfe8ff;
+  padding: 12px;
+  max-width: 300px;
+  line-height: 1.4;
+}
+
+.popup-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #00d4ff;
+  font-weight: 700;
+}
+
+.popup-desc {
+  margin-bottom: 10px;
+}
+
+.popup-swiper {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.popup-swiper .swiper-slide img {
+  height: auto;
+  width: 100%;
+  border-radius: 6px;
+  box-shadow: 0 0 5px #00bfff66;
+}
+
+.project-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: #00bfff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.project-link:hover {
+  text-decoration: underline;
+}
+
+  </style>
 </head>
 <body>
-<header>
-    <div id="lang-switcher">
-        <button onclick="switchLang('fr')">🇫🇷</button>
-        <button onclick="switchLang('de')">🇩🇪</button>
+<div id="background-animation"></div>
+
+  <div id="map"></div>
+
+  <div id="fullscreenGallery" class="fullscreen-gallery">
+    <div class="close-gallery" onclick="closeGallery()">&times;</div>
+    <div class="swiper-container fullscreen-swiper">
+      <div class="swiper-wrapper" id="fullscreenSlides"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
     </div>
-    <h1 style="
-    font-family: 'Montserrat', sans-serif;
-    font-size: 4rem;
-    font-weight: 800;
-    background: linear-gradient(to right, #00ffe7, #00c6a7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 3px 3px 6px rgba(0,0,0,0.25);
-    margin-bottom: 20px;
-">
-    <span class="fr">Projet Franco-Allemand</span>
-    <span class="de">Deutsch-Französisches Projekt</span>
-</h1>
+  </div>
+
+<script>
+  const map = L.map('map').setView([50, 10], 4);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OpenStreetMap & CartoDB',
+  maxZoom: 19
+}).addTo(map);
 
 
-    <p style="
-    font-size: 1.2rem;
-    font-style: italic;
-    color: #e0f7f4;
-    opacity: 0.85;
-    letter-spacing: 1px;
-    margin-top: -10px;
-" class="fr">Un abri solaire pour vélos et trottinettes</p>
 
-<p style="
-    font-size: 1.2rem;
-    font-style: italic;
-    color: #e0f7f4;
-    opacity: 0.85;
-    letter-spacing: 1px;
-    margin-top: -10px;
-" class="de">Ein Solarunterstand für Fahrräder und E-Scooter</p>
+
+
+
+
 
     
-</header>
 
-<nav>
-    <a href="#project">Projet / Projekt</a>
-    <a href="#goals">Objectifs / Ziele</a>
-    <a href="#gallery">Galerie / Galerie</a>
-    <a href="#infos">Infos / Infos</a>
-    <a href="#video">Vidéo</a>
-</nav>
-
-<section id="project" data-aos="fade-up">
-    <h2 class="fr">🌟 Présentation du projet</h2>
-    <h2 class="de">🌟 Projektbeschreibung</h2>
-    <p class="fr">Ce projet est réalisé par des élèves français et allemands. Il s'agit de construire un abri à vélos avec des panneaux solaires pour recharger des trottinettes électriques.</p>
-    <p class="de">Dieses Projekt wird von französischen und deutschen Schüler*innen durchgeführt. Ziel ist es, einen Solarunterstand für Fahrräder zu bauen, um E-Scooter aufzuladen.</p>
-</section>
-
-<section id="goals" data-aos="fade-up">
-    <h2 class="fr">📊 Objectifs</h2>
-    <h2 class="de">📊 Ziele</h2>
-    <ul>
-        <li class="fr">Utiliser l'énergie solaire</li>
-        <li class="de">Nutzung von Solarenergie</li>
-        <li class="fr">Favoriser la mobilité douce</li>
-        <li class="de">Umweltfreundliche Mobilität fördern</li>
-        <li class="fr">Coopération européenne</li>
-        <li class="de">Europäische Zusammenarbeit</li>
-    </ul>
-</section>
-
-<section id="gallery" data-aos="fade-up">
-    <h2 class="fr">📸 Galerie photos</h2>
-    <h2 class="de">📸 Fotogalerie</h2>
-    <div class="galerie">
-  <a href="1749022414742.jpg" class="glightbox"><img src="1749022414742.jpg" alt="" onerror="this.style.display='none'"></a>
-  
-  
-  <a href="1749022414746.jpg" class="glightbox"><img src="1749022414746.jpg" alt="" onerror="this.style.display='none'"></a>
-  
-  <a href="1749022414748.jpg" class="glightbox"><img src="1749022414748.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414752.jpg" class="glightbox"><img src="1749022414752.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414754.jpg" class="glightbox"><img src="1749022414754.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414757.jpg" class="glightbox"><img src="1749022414757.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414760.jpg" class="glightbox"><img src="1749022414760.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414763.jpg" class="glightbox"><img src="1749022414763.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414766.jpg" class="glightbox"><img src="1749022414766.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414769.jpg" class="glightbox"><img src="1749022414769.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414772.jpg" class="glightbox"><img src="1749022414772.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414775.jpg" class="glightbox"><img src="1749022414775.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414781.jpg" class="glightbox"><img src="1749022414781.jpg" alt="" onerror="this.style.display='none'"></a>
-  
-  <a href="1749022414787.jpg" class="glightbox"><img src="1749022414787.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414790.jpg" class="glightbox"><img src="1749022414790.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414794.jpg" class="glightbox"><img src="1749022414794.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414798.jpg" class="glightbox"><img src="1749022414798.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414800.jpg" class="glightbox"><img src="1749022414800.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414806.jpg" class="glightbox"><img src="1749022414806.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414809.jpg" class="glightbox"><img src="1749022414809.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414812.jpg" class="glightbox"><img src="1749022414812.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414815.jpg" class="glightbox"><img src="1749022414815.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414818.jpg" class="glightbox"><img src="1749022414818.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414821.jpg" class="glightbox"><img src="1749022414821.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414825.jpg" class="glightbox"><img src="1749022414825.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414828.jpg" class="glightbox"><img src="1749022414828.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414832.jpg" class="glightbox"><img src="1749022414832.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414836.jpg" class="glightbox"><img src="1749022414836.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414839.jpg" class="glightbox"><img src="1749022414839.jpg" alt="" onerror="this.style.display='none'"></a>
-  <a href="1749022414842.jpg" class="glightbox"><img src="1749022414842.jpg" alt="" onerror="this.style.display='none'"></a>
-  
-</div>
-
-</section>
-
-
-
-
-</section>
-
-<section id="infos" data-aos="fade-up">
-    <h2 class="fr">📅 Infos pratiques</h2>
-    <h2 class="de">📅 Praktische Informationen</h2>
-    <p class="fr"><strong>Participants :</strong> Lycée Henri Darras + école allemande</p>
-    <p class="de"><strong>Teilnehmer:</strong> Lycée Henri Darras + deutsche Schule</p>
-    <p class="fr"><strong>Période :</strong> Mai – Juin 2025</p>
-    <p class="de"><strong>Zeitraum:</strong> Mai – Juni 2025</p>
-    <p class="fr"><strong>Lieu :</strong> Cour du lycée</p>
-    <p class="de"><strong>Ort:</strong> Schulhof</p>
-</section>
-
-<section id="video" data-aos="fade-up">
-    <h2 class="fr">🎥 Vidéo du projet</h2>
-    <h2 class="de">🎥 Projektvideo</h2>
-    <p class="fr">Voici une vidéo qui explique le fonctionnement d'un abri solaire :</p>
-    <p class="de">Ein Video erklärt, wie ein Solarunterstand funktioniert:</p>
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/Yt9EB2gU2Xo" title="YouTube video" allowfullscreen></iframe>
-</section>
-
-<footer>
-    <p class="fr">Conçu par les élèves du projet franco-allemand</p>
-    <p class="de">Erstellt von den Schüler*innen des deutsch-französischen Projekts</p>
-</footer>
-
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script>
-AOS.init();
-function switchLang(lang) {
-    document.querySelectorAll('.fr, .de').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
-}
-window.onload = () => switchLang('fr');
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
-
-<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-<script>
-    AOS.init();
-    function switchLang(lang) {
-        document.querySelectorAll('.fr, .de').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
-    }
-    window.onload = () => switchLang('fr');
-</script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
-<script>
-    const lightbox = GLightbox({
-        selector: '.glightbox',
-        touchNavigation: true,
-        loop: true,
-        zoomable: true,
-        closeButton: true
+  function openGallery(images) {
+    const container = document.getElementById('fullscreenSlides');
+    container.innerHTML = images.map(src => `
+      <div class="swiper-slide"><img src="${src}" alt="galerie"></div>
+    `).join('');
+    document.getElementById('fullscreenGallery').classList.add('active');
+    new Swiper('.fullscreen-swiper', {
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      loop: true
     });
-</script>
-<script>
-document.querySelectorAll('.galerie a img').forEach(img => {
-  img.addEventListener('error', () => {
-    const parent = img.closest('a');
-    if (parent) parent.remove();
+  }
+
+  function closeGallery() {
+    document.getElementById('fullscreenGallery').classList.remove('active');
+  }
+
+  function ajouterPoint(lat, lon, titre, description, images, lienProjet, iconePerso = null) {
+    const slides = images.map(src => `
+
+      <div class="swiper-slide">
+        <img src="${src}" alt="miniature" onclick='openGallery(${JSON.stringify(images)})'>
+      </div>
+    `).join('');
+
+   const swiperHTML = `
+  <div class="swiper-container popup-swiper">
+    <div class="swiper-wrapper">${slides}</div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-button-next"></div>
+  </div>
+`;
+
+const htmlPopup = `
+  <div class="popup-content">
+    <h3>${titre}</h3>
+    <p class="popup-desc">${description}</p>
+    ${swiperHTML}
+   <a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/" target="_blank">Voir le projet complet</a>
+
+  </div>
+`;
+
+
+    const markerOptions = iconePerso
+      ? { icon: L.icon({ iconUrl: iconePerso, iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48] }) }
+      : {};
+
+    L.marker([lat, lon], markerOptions).addTo(map)
+      .bindPopup(htmlPopup, { maxWidth: 400 })
+      .on('popupopen', () => {
+        new Swiper('.swiper-container', {
+          slidesPerView: 2,
+          spaceBetween: 10,
+          navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
+        });
+      });
+  }
+
+  
+ ajouterPoint(
+  48.7758, 9.1829, 'Stuttgart, Allemagne', 'Projet OPHAGE+ en mars 2024.', [
+    "1749022414742.jpg", "1749022414746.jpg", "1749022414748.jpg", "1749022414752.jpg", "1749022414754.jpg",
+    "1749022414757.jpg", "1749022414760.jpg", "1749022414763.jpg", "1749022414766.jpg", "1749022414769.jpg",
+    "1749022414772.jpg", "1749022414775.jpg", "1749022414781.jpg", "1749022414787.jpg", "1749022414790.jpg",
+    "1749022414794.jpg", "1749022414798.jpg", "1749022414800.jpg", "1749022414806.jpg", "1749022414809.jpg",
+    "1749022414812.jpg", "1749022414815.jpg", "1749022414818.jpg", "1749022414821.jpg", "1749022414825.jpg",
+    "1749022414828.jpg", "1749022414832.jpg", "1749022414836.jpg", "1749022414839.jpg", "1749022414842.jpg",
+    "1749553668331.jpg", "1749553668333.jpg", "1749553668336.jpg"
+  ],
+  'projets/stuttgart.html',
+  'Franco-allemand.png'
+);
+
+
+  
+  L.marker([50.43110, 2.79050], {
+    icon: L.icon({
+      iconUrl: "Lycée.png",
+      iconSize: [48, 48],
+      iconAnchor: [24, 48],
+      popupAnchor: [0, -48]
+    })
+  }).addTo(map)
+    .bindPopup(`
+      <div class="popup-genially">
+        <h3 style="padding:10px; text-align:center;">Lycée Henri Darras - Liévin</h3>
+        <div style="position:relative; width:95vw; height:53.43vw;">
+          <iframe src="https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin"
+                  allowfullscreen loading="lazy"></iframe>
+        </div>
+      </div>
+    `, {
+      maxWidth: 9999,
+      className: 'popup-genially'
+    })
+    .on('popupopen', () => {
+  new Swiper('.popup-swiper', {
+    slidesPerView: 1.2,
+    spaceBetween: 10,
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    }
   });
 });
+ajouterPoint(
+  50.7205, 2.2304, // Coordonnées exactes de La Coupole
+  'La Coupole d’Helfaut',
+  'Sortie scolaire devoir de mémoire.',
+  [
+    "coupole1.jpg", "coupole2.jpg", "coupole3.jpg", "coupole4.jpg"
+  ],
+  'projets/coupole.html',
+  'coupole.png' // Le nom de l'image que tu viens de nommer
+);
+
+
 </script>
-
-
-
 </body>
 </html>
