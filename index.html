@@ -292,7 +292,7 @@
     zoom: 4
   };
 
-  // Recentre la carte quand on ferme un popup
+  
   map.on('popupclose', () => {
     map.setView(vueInitiale.center, vueInitiale.zoom);
   });
@@ -340,7 +340,7 @@
         <h3>${titre}</h3>
         <p class="popup-desc">${description}</p>
         ${swiperHTML}
-        <a class="project-link" href="${lienProjet}" target="_blank">Voir le projet complet</a>
+        <a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/}" target="_blank">Voir le projet complet</a>
       </div>
     `;
 
@@ -359,8 +359,8 @@
       });
     });
 
-    marker.addTo(map);        // ✅ Important pour qu'il apparaisse !
-    oms.addMarker(marker);    // ✅ Pour spiderfier les proches
+    marker.addTo(map);        
+    oms.addMarker(marker);    
   }
 
   // 🎯 Marqueur 1 – Stuttgart
