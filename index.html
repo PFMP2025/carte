@@ -16,6 +16,10 @@
 
 
   <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <!-- Spiderfier -->
+<script src="https://cdn.jsdelivr.net/npm/overlapping-marker-spiderfier-leaflet/dist/oms.min.js"></script>
+
+
 
   <style>
     body {
@@ -233,6 +237,12 @@
 .project-link:hover {
   text-decoration: underline;
 }
+#fullscreenGenially iframe {
+  width: 100vw;
+  height: 100vh;
+  display: block;
+}
+
 
   </style>
 </head>
@@ -241,31 +251,56 @@
 
   <div id="map"></div>
 
-  <div id="fullscreenGallery" class="fullscreen-gallery">
-    <div class="close-gallery" onclick="closeGallery()">&times;</div>
-    <div class="swiper-container fullscreen-swiper">
-      <div class="swiper-wrapper" id="fullscreenSlides"></div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-    </div>
+  <!-- 📸 Galerie photo plein écran -->
+<div id="fullscreenGallery" class="fullscreen-gallery">
+  <div class="close-gallery" onclick="closeGallery()">&times;</div>
+  <div class="swiper-container fullscreen-swiper">
+    <div class="swiper-wrapper" id="fullscreenSlides"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
   </div>
+</div>
+
+<!-- 🌐 Genially plein écran -->
+<div id="fullscreenGenially" class="fullscreen-gallery">
+  <div class="close-gallery" onclick="closeGenially()">&times;</div>
+  <iframe id="geniallyFrame" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+</div>
+
 
 <script>
-  const map = L.map('map').setView([50, 10], 4);
+  const map = L.map('map', {
+    center: [50, 10],
+    zoom: 4,
+    scrollWheelZoom: true,
+    zoomControl: true
+  });
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; OpenStreetMap & CartoDB',
-  maxZoom: 19
-}).addTo(map);
+  const oms = new OverlappingMarkerSpiderfier(map, {
+    keepSpiderfied: true,
+    nearbyDistance: 80,
+    circleSpiralSwitchover: 6,
+    legWeight: 1.5,
+    legColors: {
+      usual: '#00e5ff',
+      highlighted: '#ff4081'
+    }
+  });
 
+  const vueInitiale = {
+    center: [50, 10],
+    zoom: 4
+  };
 
+  // Recentre la carte quand on ferme un popup
+  map.on('popupclose', () => {
+    map.setView(vueInitiale.center, vueInitiale.zoom);
+  });
 
-
-
-
-
-
-    
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; OpenStreetMap & CartoDB',
+    maxZoom: 19
+  }).addTo(map);
 
   function openGallery(images) {
     const container = document.getElementById('fullscreenSlides');
@@ -274,116 +309,126 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     `).join('');
     document.getElementById('fullscreenGallery').classList.add('active');
     new Swiper('.fullscreen-swiper', {
-      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-      loop: true
+      initialSlide: 0,
+      loop: true,
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
     });
   }
 
   function closeGallery() {
     document.getElementById('fullscreenGallery').classList.remove('active');
+    map.setView(vueInitiale.center, vueInitiale.zoom);
   }
 
   function ajouterPoint(lat, lon, titre, description, images, lienProjet, iconePerso = null) {
     const slides = images.map(src => `
-
       <div class="swiper-slide">
         <img src="${src}" alt="miniature" onclick='openGallery(${JSON.stringify(images)})'>
       </div>
     `).join('');
 
-   const swiperHTML = `
-  <div class="swiper-container popup-swiper">
-    <div class="swiper-wrapper">${slides}</div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-button-next"></div>
-  </div>
-`;
+    const swiperHTML = `
+      <div class="swiper-container popup-swiper">
+        <div class="swiper-wrapper">${slides}</div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+    `;
 
-const htmlPopup = `
-  <div class="popup-content">
-    <h3>${titre}</h3>
-    <p class="popup-desc">${description}</p>
-    ${swiperHTML}
-   <a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/" target="_blank">Voir le projet complet</a>
-
-  </div>
-`;
-
+    const htmlPopup = `
+      <div class="popup-content">
+        <h3>${titre}</h3>
+        <p class="popup-desc">${description}</p>
+        ${swiperHTML}
+        <a class="project-link" href="${lienProjet}" target="_blank">Voir le projet complet</a>
+      </div>
+    `;
 
     const markerOptions = iconePerso
       ? { icon: L.icon({ iconUrl: iconePerso, iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48] }) }
       : {};
 
-    L.marker([lat, lon], markerOptions).addTo(map)
-      .bindPopup(htmlPopup, { maxWidth: 400 })
-      .on('popupopen', () => {
-        new Swiper('.swiper-container', {
-          slidesPerView: 2,
-          spaceBetween: 10,
-          navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
-        });
+    const marker = L.marker([lat, lon], markerOptions)
+      .bindPopup(htmlPopup, { maxWidth: 400 });
+
+    marker.on('popupopen', () => {
+      new Swiper('.swiper-container', {
+        slidesPerView: 2,
+        spaceBetween: 10,
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' }
       });
+    });
+
+    marker.addTo(map);        // ✅ Important pour qu'il apparaisse !
+    oms.addMarker(marker);    // ✅ Pour spiderfier les proches
   }
 
-  
- ajouterPoint(
-  48.7758, 9.1829, 'Stuttgart, Allemagne', 'Projet OPHAGE+ en mars 2024.', [
-    "1749022414742.jpg", "1749022414746.jpg", "1749022414748.jpg", "1749022414752.jpg", "1749022414754.jpg",
-    "1749022414757.jpg", "1749022414760.jpg", "1749022414763.jpg", "1749022414766.jpg", "1749022414769.jpg",
-    "1749022414772.jpg", "1749022414775.jpg", "1749022414781.jpg", "1749022414787.jpg", "1749022414790.jpg",
-    "1749022414794.jpg", "1749022414798.jpg", "1749022414800.jpg", "1749022414806.jpg", "1749022414809.jpg",
-    "1749022414812.jpg", "1749022414815.jpg", "1749022414818.jpg", "1749022414821.jpg", "1749022414825.jpg",
-    "1749022414828.jpg", "1749022414832.jpg", "1749022414836.jpg", "1749022414839.jpg", "1749022414842.jpg",
-    "1749553668331.jpg", "1749553668333.jpg", "1749553668336.jpg"
-  ],
-  'projets/stuttgart.html',
-  'Franco-allemand.png'
-);
+  // 🎯 Marqueur 1 – Stuttgart
+  ajouterPoint(
+    48.7758, 9.1829, 'Stuttgart, Allemagne', 'Projet OPHAGE+ en mars 2024.', [
+      "1749022414742.jpg", "1749022414746.jpg", "1749022414748.jpg", "1749022414752.jpg", "1749022414754.jpg",
+      "1749022414757.jpg", "1749022414760.jpg", "1749022414763.jpg", "1749022414766.jpg", "1749022414769.jpg",
+      "1749022414772.jpg", "1749022414775.jpg", "1749022414781.jpg", "1749022414787.jpg", "1749022414790.jpg",
+      "1749022414794.jpg", "1749022414798.jpg", "1749022414800.jpg", "1749022414806.jpg", "1749022414809.jpg",
+      "1749022414812.jpg", "1749022414815.jpg", "1749022414818.jpg", "1749022414821.jpg", "1749022414825.jpg",
+      "1749022414828.jpg", "1749022414832.jpg", "1749022414836.jpg", "1749022414839.jpg", "1749022414842.jpg",
+      "1749553668331.jpg", "1749553668333.jpg", "1749553668336.jpg"
+    ],
+    'projets/stuttgart.html',
+    'Franco-allemand.png'
+  );
 
-
-  
-  L.marker([50.43110, 2.79050], {
+  // 🎯 Marqueur 2 – Lycée Darras
+  const lyceeMarker = L.marker([50.43110, 2.79050], {
     icon: L.icon({
       iconUrl: "Lycée.png",
       iconSize: [48, 48],
       iconAnchor: [24, 48],
       popupAnchor: [0, -48]
     })
-  }).addTo(map)
-    .bindPopup(`
-      <div class="popup-genially">
-        <h3 style="padding:10px; text-align:center;">Lycée Henri Darras - Liévin</h3>
-        <div style="position:relative; width:95vw; height:53.43vw;">
-          <iframe src="https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin"
-                  allowfullscreen loading="lazy"></iframe>
-        </div>
+  }).bindPopup(`
+    <div class="popup-genially">
+      <h3 style="padding:10px; text-align:center;">Lycée Henri Darras - Liévin</h3>
+      <div style="position:relative; width:95vw; height:53.43vw;">
+        <iframe src="https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin"
+                allowfullscreen loading="lazy"></iframe>
+        <button onclick="openGeniallyFullscreen('https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin')" 
+                style="position:absolute; top:10px; right:10px; padding:6px 12px; font-weight:bold; font-size:14px; background:#00bfff; color:white; border:none; border-radius:6px; cursor:pointer; z-index:10;">
+          🔍 Plein écran
+        </button>
       </div>
-    `, {
-      maxWidth: 9999,
-      className: 'popup-genially'
-    })
-    .on('popupopen', () => {
-  new Swiper('.popup-swiper', {
-    slidesPerView: 1.2,
-    spaceBetween: 10,
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev'
-    }
+    </div>
+  `, {
+    maxWidth: 9999,
+    className: 'popup-genially'
   });
-});
-ajouterPoint(
-  50.7205, 2.2304, // Coordonnées exactes de La Coupole
-  'La Coupole d’Helfaut',
-  'Sortie scolaire devoir de mémoire.',
-  [
-    "coupole1.jpg", "coupole2.jpg", "coupole3.jpg", "coupole4.jpg"
-  ],
-  'projets/coupole.html',
-  'coupole.png' // Le nom de l'image que tu viens de nommer
-);
 
+  lyceeMarker.addTo(map);          // ✅ Ajouter à la carte
+  oms.addMarker(lyceeMarker);      // ✅ Ajouter à spiderfier
 
+  // 🎯 Marqueur 3 – La Coupole
+  ajouterPoint(
+    50.7205, 2.2304,
+    'La Coupole d’Helfaut',
+    'Sortie scolaire devoir de mémoire.',
+    ["coupole1.jpg", "coupole2.jpg", "coupole3.jpg", "coupole4.jpg"],
+    'projets/coupole.html',
+    'coupole.png'
+  );
+
+  // Plein écran Genially
+  function openGeniallyFullscreen(url) {
+    document.getElementById('geniallyFrame').src = url;
+    document.getElementById('fullscreenGenially').classList.add('active');
+    map.closePopup();
+  }
+
+  function closeGenially() {
+    document.getElementById('fullscreenGenially').classList.remove('active');
+    document.getElementById('geniallyFrame').src = '';
+    map.setView(vueInitiale.center, vueInitiale.zoom);
+  }
 </script>
+
 </body>
 </html>
