@@ -336,13 +336,13 @@
     `;
 
     const htmlPopup = `
-      <div class="popup-content">
-        <h3>${titre}</h3>
-        <p class="popup-desc">${description}</p>
-        ${swiperHTML}
-        <a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/" target="_blank">Voir le projet complet</a>
-      </div>
-    `;
+  <div class="popup-content">
+    <h3>${titre}</h3>
+    <p class="popup-desc">${description}</p>
+    ${swiperHTML}
+    ${titre.includes("Stuttgart") ? `<a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/" target="_blank">Voir le projet complet</a>` : ''}
+  </div>
+`;
 
     const markerOptions = iconePerso
       ? { icon: L.icon({ iconUrl: iconePerso, iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48] }) }
