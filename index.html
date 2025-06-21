@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projet Franco-Allemand - Abri Solaire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@next/dist/aos.css" rel="stylesheet" />
+	
+<link href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" rel="stylesheet">
+
+	
+<link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+<style>
+/* === CSS COMPLET POUR LA GALERIE AVEC GLIGHTBOX === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to bottom right, #f4f7f9, #e0f7f4);
+  color: #333;
+  line-height: 1.6;
+}
+
+header {
+  background: linear-gradient(90deg, #00695c, #003d33);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+#lang-switcher {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#lang-switcher button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: transform 0.2s;
+}
+
+#lang-switcher button:hover {
+  transform: scale(1.2);
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+header img {
+  width: 40px;
+  vertical-align: middle;
+  margin: 0 10px;
+}
+
+nav {
+  background-color: #003d33;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+nav a {
+  background: linear-gradient(to right, #00c6a7, #007b5e);
+  padding: 10px 20px;
+  border-radius: 30px;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s, transform 0.2s;
+}
+
+nav a:hover {
+  background: linear-gradient(to right, #007b5e, #00c6a7);
+  transform: scale(1.05);
+}
+
+section {
+  padding: 60px 30px;
+  max-width: 1000px;
+  margin: 40px auto;
+  animation: fadeIn 1s ease;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+h2 {
+  color: #0d9488;
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+}
+
+ul {
+  list-style: disc inside;
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.galerie {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.galerie a {
+  display: block;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.galerie img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.galerie a:hover img {
+  transform: scale(1.05);
+}
+
+iframe {
+  display: block;
+  margin: 20px auto;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+  background-color: #003d33;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9rem;
+  margin-top: 40px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fr, .de {
+  display: none;
+}
+</style>
+
+</head>
+<body>
+<header>
+    <div id="lang-switcher">
+        <button onclick="switchLang('fr')">🇫🇷</button>
+        <button onclick="switchLang('de')">🇩🇪</button>
+    </div>
+    <h1 style="
+    font-family: 'Montserrat', sans-serif;
+    font-size: 4rem;
+    font-weight: 800;
+    background: linear-gradient(to right, #00ffe7, #00c6a7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 3px 3px 6px rgba(0,0,0,0.25);
+    margin-bottom: 20px;
+">
+    <span class="fr">Projet Franco-Allemand</span>
+    <span class="de">Deutsch-Französisches Projekt</span>
+</h1>
+
+
+    <p style="
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #e0f7f4;
+    opacity: 0.85;
+    letter-spacing: 1px;
+    margin-top: -10px;
+" class="fr">Un abri solaire pour vélos et trottinettes</p>
+
+<p style="
+    font-size: 1.2rem;
+    font-style: italic;
+    color: #e0f7f4;
+    opacity: 0.85;
+    letter-spacing: 1px;
+    margin-top: -10px;
+" class="de">Ein Solarunterstand für Fahrräder und E-Scooter</p>
+
+    
+</header>
+
+<nav>
+    <a href="#project">Projet / Projekt</a>
+    <a href="#goals">Objectifs / Ziele</a>
+    <a href="#gallery">Galerie / Galerie</a>
+    <a href="#infos">Infos / Infos</a>
+    <a href="#video">Vidéo</a>
+</nav>
+
+<section id="project" data-aos="fade-up">
+    <h2 class="fr">🌟 Présentation du projet</h2>
+    <h2 class="de">🌟 Projektbeschreibung</h2>
+    <p class="fr">Ce projet est réalisé par des élèves français et allemands. Il s'agit de construire un abri à vélos avec des panneaux solaires pour recharger des trottinettes électriques.</p>
+    <p class="de">Dieses Projekt wird von französischen und deutschen Schüler*innen durchgeführt. Ziel ist es, einen Solarunterstand für Fahrräder zu bauen, um E-Scooter aufzuladen.</p>
+</section>
+
+<section id="goals" data-aos="fade-up">
+    <h2 class="fr">📊 Objectifs</h2>
+    <h2 class="de">📊 Ziele</h2>
+    <ul>
+        <li class="fr">Utiliser l'énergie solaire</li>
+        <li class="de">Nutzung von Solarenergie</li>
+        <li class="fr">Favoriser la mobilité douce</li>
+        <li class="de">Umweltfreundliche Mobilität fördern</li>
+        <li class="fr">Coopération européenne</li>
+        <li class="de">Europäische Zusammenarbeit</li>
+    </ul>
+</section>
+
+<section id="gallery" data-aos="fade-up">
+    <h2 class="fr">📸 Galerie photos</h2>
+    <h2 class="de">📸 Fotogalerie</h2>
+    <div class="galerie">
+  <a href="1749022414742.jpg" class="glightbox"><img src="1749022414742.jpg" alt="" onerror="this.style.display='none'"></a>
+  
+  
+  <a href="1749022414746.jpg" class="glightbox"><img src="1749022414746.jpg" alt="" onerror="this.style.display='none'"></a>
+  
+  <a href="1749022414748.jpg" class="glightbox"><img src="1749022414748.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414752.jpg" class="glightbox"><img src="1749022414752.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414754.jpg" class="glightbox"><img src="1749022414754.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414757.jpg" class="glightbox"><img src="1749022414757.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414760.jpg" class="glightbox"><img src="1749022414760.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414763.jpg" class="glightbox"><img src="1749022414763.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414766.jpg" class="glightbox"><img src="1749022414766.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414769.jpg" class="glightbox"><img src="1749022414769.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414772.jpg" class="glightbox"><img src="1749022414772.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414775.jpg" class="glightbox"><img src="1749022414775.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414781.jpg" class="glightbox"><img src="1749022414781.jpg" alt="" onerror="this.style.display='none'"></a>
+  
+  <a href="1749022414787.jpg" class="glightbox"><img src="1749022414787.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414790.jpg" class="glightbox"><img src="1749022414790.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414794.jpg" class="glightbox"><img src="1749022414794.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414798.jpg" class="glightbox"><img src="1749022414798.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414800.jpg" class="glightbox"><img src="1749022414800.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414806.jpg" class="glightbox"><img src="1749022414806.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414809.jpg" class="glightbox"><img src="1749022414809.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414812.jpg" class="glightbox"><img src="1749022414812.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414815.jpg" class="glightbox"><img src="1749022414815.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414818.jpg" class="glightbox"><img src="1749022414818.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414821.jpg" class="glightbox"><img src="1749022414821.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414825.jpg" class="glightbox"><img src="1749022414825.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414828.jpg" class="glightbox"><img src="1749022414828.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414832.jpg" class="glightbox"><img src="1749022414832.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414836.jpg" class="glightbox"><img src="1749022414836.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414839.jpg" class="glightbox"><img src="1749022414839.jpg" alt="" onerror="this.style.display='none'"></a>
+  <a href="1749022414842.jpg" class="glightbox"><img src="1749022414842.jpg" alt="" onerror="this.style.display='none'"></a>
+  
+</div>
+
+</section>
+
+
+
+
+</section>
+
+<section id="infos" data-aos="fade-up">
+    <h2 class="fr">📅 Infos pratiques</h2>
+    <h2 class="de">📅 Praktische Informationen</h2>
+    <p class="fr"><strong>Participants :</strong> Lycée Henri Darras + école allemande</p>
+    <p class="de"><strong>Teilnehmer:</strong> Lycée Henri Darras + deutsche Schule</p>
+    <p class="fr"><strong>Période :</strong> Mai – Juin 2025</p>
+    <p class="de"><strong>Zeitraum:</strong> Mai – Juni 2025</p>
+    <p class="fr"><strong>Lieu :</strong> Cour du lycée</p>
+    <p class="de"><strong>Ort:</strong> Schulhof</p>
+</section>
+
+<section id="video" data-aos="fade-up">
+    <h2 class="fr">🎥 Vidéo du projet</h2>
+    <h2 class="de">🎥 Projektvideo</h2>
+    <p class="fr">Voici une vidéo qui explique le fonctionnement d'un abri solaire :</p>
+    <p class="de">Ein Video erklärt, wie ein Solarunterstand funktioniert:</p>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/Yt9EB2gU2Xo" title="YouTube video" allowfullscreen></iframe>
+</section>
+
+<footer>
+    <p class="fr">Conçu par les élèves du projet franco-allemand</p>
+    <p class="de">Erstellt von den Schüler*innen des deutsch-französischen Projekts</p>
+</footer>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+AOS.init();
+function switchLang(lang) {
+    document.querySelectorAll('.fr, .de').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
+}
+window.onload = () => switchLang('fr');
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script>
+    AOS.init();
+    function switchLang(lang) {
+        document.querySelectorAll('.fr, .de').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.' + lang).forEach(el => el.style.display = 'block');
+    }
+    window.onload = () => switchLang('fr');
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    const lightbox = GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: true,
+        zoomable: true,
+        closeButton: true
+    });
+</script>
+<script>
+document.querySelectorAll('.galerie a img').forEach(img => {
+  img.addEventListener('error', () => {
+    const parent = img.closest('a');
+    if (parent) parent.remove();
+  });
+});
+</script>
+
+
+
+</body>
+</html>
