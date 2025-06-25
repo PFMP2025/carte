@@ -242,6 +242,25 @@
   height: 100vh;
   display: block;
 }
+#fullscreenStreet iframe {
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  display: block;
+}
+#streetPopup {
+  opacity: 0;
+  animation: fadeInBtn 1s ease forwards;
+  animation-delay: 1s;
+}
+
+@keyframes fadeInBtn {
+  to {
+    opacity: 1;
+  }
+}
+
+
 
 
   </style>
@@ -262,10 +281,64 @@
 </div>
 
 <!-- 🌐 Genially plein écran -->
-<div id="fullscreenGenially" class="fullscreen-gallery">
-  <div class="close-gallery" onclick="closeGenially()">&times;</div>
-  <iframe id="geniallyFrame" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+<!-- 🚶 Street View intégré -->
+<div id="fullscreenStreet" class="fullscreen-gallery">
+  <div class="close-gallery" onclick="closeStreetView()">&times;</div>
+  <iframe id="streetFrame" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+ <button onclick="retourCarteDepuisStreetView()" style="
+  position: absolute;
+  top: 15px;
+  left: 25px;
+  padding: 6px 12px;
+  font-size: 14px;
+  background: #0a0f24;
+  color: #00e5ff;
+  border: 1px solid #00e5ff;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 10001;
+">
+  🗺️ Retour à la carte
+</button>
+
+
+
+  <!-- Petit popup en overlay -->
+  <!-- Popup directement sur les portes -->
+<div id="streetPopup" style="
+  position: absolute;
+  top: 45%;    /* 💡 ajuste ici pour viser les portes */
+  left: 42%;   /* 💡 ajuste ici pour viser les portes */
+  transform: translate(-50%, -50%);
+  background: rgba(10,15,36,0.85);
+  color: #00e5ff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  z-index: 10001;
+  box-shadow: 0 0 8px #00e5ff;
+  font-size: 13px;
+  text-align: center;
+">
+  <strong>Lycée Henri Darras</strong><br>
+  Découvrez l'établissement en immersion !
+  <br><br>
+  <button onclick="openGeniallyFullscreen('https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin')" style="
+    margin-top:6px;
+    padding:6px 10px;
+    font-size:13px;
+    background:#00bfff;
+    border:none;
+    border-radius:5px;
+    color:white;
+    cursor:pointer;
+  ">
+    Présentation du lycée
+  </button>
+
+
+  </div>
 </div>
+
 
 
 <script>
@@ -292,7 +365,7 @@
     zoom: 4
   };
 
-  
+  // Recentre la carte quand on ferme un popup
   map.on('popupclose', () => {
     map.setView(vueInitiale.center, vueInitiale.zoom);
   });
@@ -336,13 +409,13 @@
     `;
 
     const htmlPopup = `
-  <div class="popup-content">
-    <h3>${titre}</h3>
-    <p class="popup-desc">${description}</p>
-    ${swiperHTML}
-    ${titre.includes("Stuttgart") ? `<a class="project-link" href="https://pfmp2025.github.io/Franco-Allemand/" target="_blank">Voir le projet complet</a>` : ''}
-  </div>
-`;
+      <div class="popup-content">
+        <h3>${titre}</h3>
+        <p class="popup-desc">${description}</p>
+        ${swiperHTML}
+        <a class="project-link" href="${lienProjet}" target="_blank">Voir le projet complet</a>
+      </div>
+    `;
 
     const markerOptions = iconePerso
       ? { icon: L.icon({ iconUrl: iconePerso, iconSize: [48, 48], iconAnchor: [24, 48], popupAnchor: [0, -48] }) }
@@ -359,8 +432,8 @@
       });
     });
 
-    marker.addTo(map);        
-    oms.addMarker(marker);    
+    marker.addTo(map);        // ✅ Important pour qu'il apparaisse !
+    oms.addMarker(marker);    // ✅ Pour spiderfier les proches
   }
 
   // 🎯 Marqueur 1 – Stuttgart
@@ -378,43 +451,73 @@
     'Franco-allemand.png'
   );
 
-  // 🎯 Marqueur 2 – Lycée Darras
-  const lyceeMarker = L.marker([50.43110, 2.79050], {
-    icon: L.icon({
-      iconUrl: "Lycée.png",
-      iconSize: [48, 48],
-      iconAnchor: [24, 48],
-      popupAnchor: [0, -48]
-    })
-  }).bindPopup(`
-    <div class="popup-genially">
-      <h3 style="padding:10px; text-align:center;">Lycée Henri Darras - Liévin</h3>
-      <div style="position:relative; width:95vw; height:53.43vw;">
-        <iframe src="https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin"
-                allowfullscreen loading="lazy"></iframe>
-        <button onclick="openGeniallyFullscreen('https://view.genial.ly/63f732e6f4bfe000186a90c5/presentation-presentation-lycee-professionnel-henri-darras-lievin')" 
-                style="position:absolute; top:10px; right:10px; padding:6px 12px; font-weight:bold; font-size:14px; background:#00bfff; color:white; border:none; border-radius:6px; cursor:pointer; z-index:10;">
-          🔍 Plein écran
-        </button>
-      </div>
-    </div>
-  `, {
-    maxWidth: 9999,
-    className: 'popup-genially'
+  // 🎯 Marqueur 2 – Lycée Darras sans popup, avec bouton immersion séparé
+const lyceeCoords = [50.41141604333816, 2.7703464976537773];
+
+const lyceeMarker = L.marker(lyceeCoords, {
+  icon: L.icon({
+    iconUrl: "Lycée.png",
+    iconSize: [48, 48],
+    iconAnchor: [24, 48],
+    popupAnchor: [0, -48]
+  })
+});
+
+lyceeMarker.on('click', () => {
+  map.flyTo(lyceeCoords, 18, {
+    duration: 2.5
   });
 
-  lyceeMarker.addTo(map);          // ✅ Ajouter à la carte
-  oms.addMarker(lyceeMarker);      // ✅ Ajouter à spiderfier
+  // Attendre que le zoom soit fini pour afficher le bouton immersion
+  setTimeout(() => {
+    // Supprimer l'ancien bouton s'il existe
+    const oldBtn = document.getElementById('immersionBtn');
+    if (oldBtn) oldBtn.remove();
+
+    const immersionBtn = document.createElement('button');
+    immersionBtn.id = 'immersionBtn';
+    immersionBtn.innerText = '🚶 Immersion';
+    immersionBtn.style.position = 'absolute';
+    immersionBtn.style.bottom = '20px';
+    immersionBtn.style.right = '20px';
+    immersionBtn.style.padding = '10px 14px';
+    immersionBtn.style.fontSize = '14px';
+    immersionBtn.style.background = '#ffa500';
+    immersionBtn.style.color = '#fff';
+    immersionBtn.style.border = 'none';
+    immersionBtn.style.borderRadius = '6px';
+    immersionBtn.style.cursor = 'pointer';
+    immersionBtn.style.zIndex = 10000;
+
+    immersionBtn.onclick = () => {
+      openStreetViewFullscreen(lyceeCoords[0], lyceeCoords[1]);
+      immersionBtn.remove();
+    };
+
+    document.body.appendChild(immersionBtn);
+  }, 2600);
+});
+
+lyceeMarker.addTo(map);
+oms.addMarker(lyceeMarker);
+
 
   // 🎯 Marqueur 3 – La Coupole
-  ajouterPoint(
-    50.7205, 2.2304,
-    'La Coupole d’Helfaut',
-    'Sortie scolaire devoir de mémoire.',
-    ["coupole1.jpg", "coupole2.jpg", "coupole3.jpg", "coupole4.jpg"],
-    'projets/coupole.html',
-    'coupole.png'
-  );
+  // 🎯 Marqueur 3 – La Coupole (version galerie)
+ajouterPoint(
+  50.7205, 2.2304,
+  'La Coupole d’Helfaut',
+  'Sortie scolaire devoir de mémoire.',
+  [
+    "IMG-20250624-WA0002.jpg", "IMG-20250624-WA0003.jpg", "IMG-20250624-WA0004.jpg",
+    "IMG-20250624-WA0005.jpg", "IMG-20250624-WA0006.jpg", "IMG-20250624-WA0007.jpg",
+    "IMG-20250624-WA0008.jpg", "IMG-20250624-WA0009.jpg", "IMG-20250624-WA0010.jpg",
+    "IMG-20250624-WA0011.jpg"
+  ],
+  'projets/coupole.html',
+  'coupole.png'
+);
+
 
   // Plein écran Genially
   function openGeniallyFullscreen(url) {
@@ -428,7 +531,35 @@
     document.getElementById('geniallyFrame').src = '';
     map.setView(vueInitiale.center, vueInitiale.zoom);
   }
+  
+ function openStreetViewFullscreen(lat, lon) {
+  map.closePopup(); // ferme tout popup éventuel
+  const url = `https://www.google.com/maps/embed?pb=!4v1719319707423!6m8!1m7!1sCAoSLEFGMVFpcE9PZldvbm1ZZlROUEFFaUlEUmFtVWNRTzRBeDRkdGFFQWJkdUJ0!2m2!1d${lat}!2d${lon}!3f0!4f0!5f0.7820865974627469`;
+  document.getElementById('streetFrame').src = url;
+  document.getElementById('fullscreenStreet').classList.add('active');
+}
+
+
+function closeStreetView() {
+  document.getElementById('fullscreenStreet').classList.remove('active');
+  document.getElementById('streetFrame').src = '';
+}
+
+function retourCarteDepuisStreetView() {
+  // Fermer la street view
+  document.getElementById('fullscreenStreet').classList.remove('active');
+  document.getElementById('streetFrame').src = '';
+
+  // Revenir à la vue initiale de la carte
+  map.setView(vueInitiale.center, vueInitiale.zoom);
+}
+
 </script>
+<!-- 🌐 Genially plein écran (MANQUAIT !) -->
+<div id="fullscreenGenially" class="fullscreen-gallery">
+  <div class="close-gallery" onclick="closeGenially()">&times;</div>
+  <iframe id="geniallyFrame" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+</div>
 
 </body>
 </html>
